@@ -1,0 +1,3 @@
+Type and provider to manage /etc/networks on most posix systems
+
+Heavily based on the original host provider, with a view to making it a bit more resilient and backporting some of those changes into the host provider
