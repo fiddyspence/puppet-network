@@ -1,0 +1,33 @@
+require 'puppet/provider/parsedfile'
+networks='/etc/networks'
+
+Puppet::Type.type(:network).provide(:parsed, :parent => Puppet::Provider::ParsedFile, :default_target => networks, :filetype => :flat) do
+  confine :exists => networks
+  desc "networks provider using the ParsedFile class"
+
+  text_line :comment, :match => /^#/
+  text_line :blank, :match => /^\s*$/
+
+  record_line :parsed, :fields => %w{name ipsubnet aliases},
+    :optional => %w{aliases},
+    :match    => /^(\S+)\s+(\S+)\s*(.*?)?(?:\s*)?$/,
+    :post_parse => proc { |hash|
+      hash[:aliases] = '' if hash[:aliases].nil? or hash[:aliases] == :absent
+      unless hash[:aliases].nil? or hash[:aliases] == :absent
+        hash[:aliases].gsub!(/\s+/,' ') # Change delimiter
+      end
+	  puts "post parse: " + hash[:name].inspect + " " + hash[:ipsubnet].inspect + " " + hash[:aliases].to_s
+    },
+  :to_line  => proc { |hash|
+    [:name, :ipsubnet].each do |n|
+       puts hash[n].inspect
+#       raise ArgumentError, "#{n} is a required attribute for networks" unless hash[n] and hash[n] != :absent
+    end
+    str = "#{hash[:name]}\t#{hash[:ipsubnet]}"
+    if hash.include? :aliases and !hash[:aliases].nil? and hash[:aliases] != :absent
+      str += "\t#{hash[:aliases]}"
+    end
+    str
+  }
+end
+

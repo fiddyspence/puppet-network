@@ -1,0 +1,28 @@
+Puppet::Type.newtype(:network) do
+
+	ensurable
+
+	newparam(:name) do
+		desc "The name of the network"
+		isnamevar
+		newvalues(/\w+/)
+	end
+
+	newparam(:ipsubnet) do
+		desc "The IP subnet of the nework"
+	#	newvalues(/^\d{1,3}\.\d{1,3}\.\d{1,3}/)
+
+	validate  do |value|
+		puts "you stuck in " + value.inspect
+	end
+
+	end
+
+	newparam(:aliases) do
+		desc "Aliases for networks"
+		newvalues(/\w+/)
+	end
+
+
+end
+
